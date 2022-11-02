@@ -12,6 +12,16 @@ class City:
     
     def city(data, zi):
         print('Concatenated Cities...')
+        column_region = []
         for i in range(len(data)):
-            region = (data['Distrito 2'].iloc[i]).split()
-            print(region[1])
+           region = (data['Distrito'].iloc[i]).split()
+           region = region[1]
+           column_region.append(region[:2])
+        
+        #buscar ciudad
+        City.search_code_cite(column_region)   
+        return(column_region)
+    
+    
+    def search_code_cite(data):
+        print(data)
