@@ -15,7 +15,7 @@ class Clean:
     #LIMPIAR NOMBRES
     def clean_name(data):
         column_name = []
-      
+        print('Cleaning names...')
         for i in range(len(data)):
             name = limpieza_texto(data['NOMBRE DEL MEDICO'].iloc[i] , 
                                   quitar_numeros=True, 
@@ -32,7 +32,7 @@ class Clean:
     #LIMPIAR DIRECCIONES
     def clean_adress(data):
         column_adress = []
-     
+        print('Cleaning adress...')
         for i in range(len(data)):
             txt = data['Dirección'].iloc[i]    
             idx = txt.find("#")
@@ -46,7 +46,10 @@ class Clean:
                                          )
                
                     stra = adress[:idx] + '#' + adress[idx:]
-                    column_adress.append(stra.upper())                
+                    column_adress.append(stra.upper()) 
+                else:
+                    column_adress.append(adress.upper())
+                   
             except Exception as e:
                 print(e)
                 pass

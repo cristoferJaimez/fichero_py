@@ -11,6 +11,8 @@ from function.readFiles import ReadingFiles
 from function.listFolder import ListenDir
 from function.cleanTxt import Clean
 from function.crossing_one_ import Crossing
+from function.city import City
+
 
 
 #activa menu
@@ -19,16 +21,11 @@ url = ListenDir().listenDir()
 res = ReadingFiles.reading('', url)
 
 
-#limpiar direcciones
+#limpiar nombre y direcciones
 name_clean = Clean.clean_name(res[1])
 adress_clean = Clean.clean_adress(res[1])
 
-
-print(name_clean)
-#print(adress_clean)
-#print(res[0])
-#print(res[1])
-#setData = Crossing.crossing_one(res[0], res[1])
-#print(setData)
+#buscar codigo ciudad
+code_city = City.city(res[1],res[2])
 
 
