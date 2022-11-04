@@ -1,6 +1,6 @@
 import pandas as pd
 from tqdm import tqdm
-
+import threading
 import numpy as np
 import numba as nb
 
@@ -27,9 +27,10 @@ other_df = conc[conc['Nombre del Medico arreglado'].isnull()]
 
 
 #recorrer faltantes
-def search(data, db):    
+"https://ucd-dnp.github.io/ConTexto/versiones/master/ejemplos/01_lectura_y_escritura_de_documentos.html#lectura-y-escritura-de-documentos"
+def search(data, db, init, limit):    
     acum = []
-    for i in tqdm(range(len(data))):
+    for i in range(init ,limit):
         medic = str(other_df['CIUDAD_MEDICO'].iloc[i])
         
         for x in range(len(db)):
@@ -37,22 +38,39 @@ def search(data, db):
             
             #comparacion 
             dif = DiferenciaStrings().comparacion_lista(medic,db_medic, tipo='jaro_winkler', norm=None)
-            if dif[0] > 0.9:
+           
+            if dif[0] > 0.87:
+                print('item:  #',i,' |',"\n NAME: |", medic, ' |SEARCH: ', db_medic, ' | %', dif[0][0]*100)
                 resp = [
                         medic,
                         db['COD CIUDAD'].iloc[x],
                         db['Nombre del Medico arreglado'].iloc[x],
                         db['ESPECIALID COMPLETA'].iloc[x],
-                        dif[0]
+                        dif[0][0]
                              ]  
                 acum.append(resp)
+                
     return acum            
-  
-da = search(other_df, db_)
+hilo1 = threading.Thread(target=search(other_df, db_, 0, 5000))
+hilo2 = threading.Thread(target=search(other_df, db_, 5000, 10000))
+hilo3 = threading.Thread(target=search(other_df, db_, 10000, 15252))
+print('init hilo one')
+hilo1.start()
+print('init hilo two')
+hilo2.start()  
+print('init hilo three')
+hilo3.start()  
+#da = search(other_df, db_)
+
+df_hilo_1 = pd.DataFrame(hilo1)
+df_hilo_2 = pd.DataFrame(hilo2)
+df_hilo_3 = pd.DataFrame(hilo3)
     
-df_ = pd.DataFrame(da)
+df_search = pd.concat([df_hilo_1,df_hilo_2,df_hilo_3])
+
+#df_ = pd.DataFrame(da, columns=['CIUDAD_MEDICO','COD CIUDAD','Nombre del Medico arreglado','ESPECIALID COMPLETA', '%'])
 print('save')
 conc.to_csv('resultado_cruze.csv', header=True, index=False, sep="|")  
-df_.to_csv('zonas de influencia.csv', header=True, index=False, sep="|")  
+df_search.to_csv('zonas de influencia.csv', header=True, index=False, sep="|")  
 
-print('end')     
+print('end') 
