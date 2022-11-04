@@ -6,22 +6,35 @@ Created on Wed Nov  2 13:58:23 2022
 """
 
 import pandas as pd
-
+from tqdm import tqdm
+import os
 
 class City:
     
     def city(data, zi):
-        print('Concatenated Cities...')
+        print('Searchs Cities...')
         column_region = []
-        for i in range(len(data)):
-           region = (data['Distrito'].iloc[i]).split()
-           region = region[1]
-           column_region.append(region[:2])
+        cod = ""
+        
+        for i in  tqdm(range(len(data))):
+            ciudad = (data['Ciudad'].iloc[i])
+            region_ = (data['REG'].iloc[i])
+            for x in range(len(zi)):
+                res =   ciudad in zi['Unnamed: 3'].iloc[x] 
+                #reg =   region_ in zi['SIGLA REG'].iloc[x]
+                if res == True:
+                    #print(zi['REGION'].iloc[x], ' in  ' , ciudad, ' =', res)
+                    cod = zi['Unnamed: 4'].iloc[x]
+                    break
+                else:
+                    cod = 'Null'
+        
+                    
+            column_region.append(cod)
+                    
+                
         
         #buscar ciudad
-        City.search_code_cite(column_region)   
+        #City.search_code_cite(column_region)   
+        
         return(column_region)
-    
-    
-    def search_code_cite(data):
-        print(data)

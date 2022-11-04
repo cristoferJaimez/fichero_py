@@ -18,4 +18,7 @@ class ReadingFiles:
         zi = pd.read_excel('./db/COL_Zinfluencia_03082022.xlsx')
         print('Reading '+ route +' plase wait...')
         file = pd.read_excel(route, sheet_name='BASE')
-        return [db, file, zi]
+        print('Reading DB_COLOMBIA_PANEL plase wait...')
+        db_panel = pd.read_excel('./db/1 - Recibidos Consolidado 1101_2022  (3) (1).xlsm', sheet_name='4-Zonas de influencia')
+        
+        return [db, file, zi, db_panel]
