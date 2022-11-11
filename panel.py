@@ -36,7 +36,6 @@ other_df = conc[conc['Nombre del Medico arreglado'].isnull()]
 
 acum = []
 
-executer = ThreadPoolExecutor(max_workers=10)
 
 def search(data, db, init, limit):    
     
@@ -81,17 +80,19 @@ def createHilo(data):
         var_dim.append('hilo'+str(j))
     """
     
-    
-    for i in range(1, 11):
-        if str(i) == '1':
-            var_ini = 0
-        else:    
-            var_ini = var_fin
-        
-        var_fin = rangeCol * i
-        executer.submit(search,other_df, db_, var_ini, var_fin)
-        var_ini = var_fin    
-        
+    with ThreadPoolExecutor(max_workers=10) as executer:
+        for i in range(1, 11):
+            if str(i) == '1':
+                var_ini = 0
+            else:    
+                var_ini = var_fin
+            
+            var_fin = rangeCol * i
+            
+            executer.submit(search,other_df, db_, var_ini, var_fin)
+            #executer.submit(search,other_df, db_, var_ini, var_fin)
+            var_ini = var_fin    
+            
      
     
     """
@@ -115,8 +116,7 @@ createHilo(other_df)
 df_acum = pd.DataFrame(acum, columns=['In nomnre medico', 'out UTC', 'out Medico ', 'out Espec', 'out %'])
 
 #df_ = pd.DataFrame(da, columns=['CIUDAD_MEDICO','COD CIUDAD','Nombre del Medico arreglado','ESPECIALID COMPLETA', '%'])
-print('save')
+
 conc.to_csv('resultado_cruze.csv', header=True, index=False, sep="|")  
 df_acum.to_csv('zonas de influencia.csv', header=True, index=False, sep="|")  
 
-print('end') 
