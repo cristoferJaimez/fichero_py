@@ -1,16 +1,10 @@
 import pandas as pd
 from tqdm import tqdm
 import threading
+import numpy as np
+import numba as nb
 
-import math
-
-from concurrent.futures  import ThreadPoolExecutor 
-
-from contexto.comparacion import DiferenciaStrings
-
-import logging
-
-logging.basicConfig(level=logging.DEBUG, format='%(threadName)s: %(message)s')
+from contexto.comparacion import Similitud, Distancia, DiferenciaStrings
 
 print('Reading DB_COLOMBIA plase wait...')
 db_ = pd.read_excel('./db_panel/1 - Recibidos Consolidado 1101_2022  (3) (1).xlsm', sheet_name='COLOMBIA-2020 septiembre')
@@ -33,18 +27,18 @@ other_df = conc[conc['Nombre del Medico arreglado'].isnull()]
 
 
 #recorrer faltantes
-
 acum = []
 
-executer = ThreadPoolExecutor(max_workers=10)
 
+
+from numba import njit
+@njit(fastmath=True, cache=True)
 def search(data, db, init, limit):    
-    
-    logging.info(f'Task start: init {init} end {limit}!!\n') 
-   
+  
     for i in range(init ,limit):
         medic = str(other_df['CIUDAD_MEDICO'].iloc[i])
         
+            
         for x in range(len(db)):
             db_medic = str(db['Codigo de Ciudad & Nombre delMedico Arreglado'].iloc[x])
             
@@ -52,7 +46,7 @@ def search(data, db, init, limit):
             dif = DiferenciaStrings().comparacion_lista(medic,db_medic, tipo='jaro_winkler', norm=None)
            
             if dif[0] > 0.87:
-                #print('hilo: ', threading.current_thread().getName() ,  ' item:  #',i,' |',"\n NAME: |", medic, ' |SEARCH: ', db_medic, ' | %', dif[0][0]*100)
+                #print('item:  #',i,' |',"\n NAME: |", medic, ' |SEARCH: ', db_medic, ' | %', dif[0][0]*100)
                 resp = [
                         medic,
                         db['COD CIUDAD'].iloc[x],
@@ -61,52 +55,34 @@ def search(data, db, init, limit):
                         dif[0][0]
                              ]  
                 acum.append(resp)
-    
-    logging.info(f'Task end: init {init} end {limit}!!\n')            
-    return acum       
+                
+    return acum            
+hilo1 = threading.Thread(name='hilo 1', target=search, args=(other_df, db_, 0, 3000))
+hilo2 = threading.Thread(name='hilo 2' ,target=search, args=(other_df, db_, 3000, 6000))
+hilo3 = threading.Thread(name='hilo 3' ,target=search, args=(other_df, db_, 6000, 9000))
+hilo4 = threading.Thread(name='hilo 4' ,target=search, args=(other_df, db_,  9000, 12000))
+hilo5 = threading.Thread(name='hilo 5' ,target=search, args=(other_df, db_,  12000, len(other_df)))
 
 
-
-def createHilo(data): 
-    num_int = len(data) / 10
-    print( math.ceil(num_int))
-    var_ini = 0
-    rangeCol = math.ceil(num_int)
-    var_fin = math.ceil(num_int)
-    #var_dim = []
-    
-    """
-    for j in range(1,12):
-        var_dim.append('hilo'+str(j))
-    """
-    
-    
-    for i in range(1, 11):
-        if str(i) == '1':
-            var_ini = 0
-        else:    
-            var_ini = var_fin
-        
-        var_fin = rangeCol * i
-        executer.submit(search,other_df, db_, var_ini, var_fin)
-        var_ini = var_fin    
-        
-     
-    
-    """
-    for k in range(1,12):
-        var_dim[k].join()
-    """    
-       
-    
-    
-    
-
-createHilo(other_df)
+print('init hilo one')
+hilo1.start()
+print('init hilo two')
+hilo2.start()  
+print('init hilo three')
+hilo3.start()  
+print('init hilo four')
+hilo4.start()  
+print('init hilo five')
+hilo5.start()  
 
 #da = search(other_df, db_)
 
 
+hilo1.join()
+hilo2.join()
+hilo3.join()
+hilo4.join()
+hilo5.join()
 
 
 
