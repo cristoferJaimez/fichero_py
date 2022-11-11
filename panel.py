@@ -47,11 +47,12 @@ def search(data, db, init, limit):
         
         for x in range(len(db)):
             db_medic = str(db['Codigo de Ciudad & Nombre delMedico Arreglado'].iloc[x])
-            
             #comparacion 
             dif = DiferenciaStrings().comparacion_lista(medic,db_medic, tipo='jaro_winkler', norm=None)
            
             if dif[0] > 0.87:
+                logging.info(f'|item:{i}/{limit}| medic: {medic}  |medic DB: {db_medic} |{round(dif[0][0]*100)}%|\n') 
+               
                 #print('hilo: ', threading.current_thread().getName() ,  ' item:  #',i,' |',"\n NAME: |", medic, ' |SEARCH: ', db_medic, ' | %', dif[0][0]*100)
                 resp = [
                         medic,
