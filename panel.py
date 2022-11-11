@@ -67,44 +67,31 @@ def search(data, db, init, limit):
 
 
 
-def createHilo(data): 
-    num_int = len(data) / 10
-    print( math.ceil(num_int))
+    
+with ThreadPoolExecutor(max_workers=10) as executer:
+    num_int = len(other_df) / 10
     var_ini = 0
     rangeCol = math.ceil(num_int)
     var_fin = math.ceil(num_int)
-    #var_dim = []
     
-    """
-    for j in range(1,12):
-        var_dim.append('hilo'+str(j))
-    """
-    
-    with ThreadPoolExecutor(max_workers=10) as executer:
-        for i in range(1, 11):
-            if str(i) == '1':
-                var_ini = 0
-            else:    
-                var_ini = var_fin
+    for i in range(1, 11):
+        if str(i) == '1':
+            var_ini = 0
+        else:
+            var_ini = var_fin
             
-            var_fin = rangeCol * i
+        var_fin = rangeCol * i
             
-            executer.submit(search,other_df, db_, var_ini, var_fin)
+        executer.submit(search,other_df, db_, var_ini, var_fin)
             #executer.submit(search,other_df, db_, var_ini, var_fin)
-            var_ini = var_fin    
+        var_ini = var_fin    
             
      
     
-    """
-    for k in range(1,12):
-        var_dim[k].join()
-    """    
-       
-    
-    
+
     
 
-createHilo(other_df)
+#createHilo(other_df)
 
 #da = search(other_df, db_)
 
