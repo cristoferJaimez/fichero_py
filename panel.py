@@ -1,13 +1,7 @@
 import pandas as pd
-from tqdm import tqdm
-import threading
-
 import math
-
 from concurrent.futures  import ThreadPoolExecutor 
-
 from contexto.comparacion import DiferenciaStrings
-
 import logging
 
 logging.basicConfig(level=logging.DEBUG, format='%(threadName)s: %(message)s')
